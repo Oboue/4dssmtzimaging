@@ -6,14 +6,14 @@
 % multi-dimensional reconstruction of SS precursors, JGR, submitted 
 
 clear; close all; clc;
-%% Read in data and calculate bounce point (midpoint)
+% Read in data and calculate bounce point (midpoint)
 addpath('../rdrr')
 addpath('../data') 
 addpath('../etopo1_bed_c_f4') 
 javaaddpath('./FMI/lib/FMI.jar');
 addpath('~/MATLAB/m_map');
 addpath('../Meier_2009') 
-addpath('../plot_tectonic_fold_maps') 
+% addpath('../plot_tectonic_fold_maps') 
 addpath('../slab')
 addpath('../MatSAC');
 addpath('../utils');
@@ -22,332 +22,30 @@ addpath('./FMI/matTaup');
 addpath('../TX2019slab')
 addpath('../irisFetch-matlab-2.0.12')
 addpath export_fig
-% load the data
-% datadir = '/Users/yunfeng/30_40/publication/oboue/western_pacific/data/*';
-% datadir = '/Users/oboue/Desktop/ssp/sspfield/western_pacific/data/*';
-% event = dir(datadir);
-% event(1:3)=[];
-% nevt = length(event);
-% ss=[];
-% for i = 1:nevt
-%     if mod(i,100) == 0
-%         disp(['Reading ',num2str(i),'/',num2str(nevt),' events']);
-%     end
-%     sacfiles=dir(fullfile(event(i).folder,event(i).name,'*.T'));
-%     for j = 1:length(sacfiles)
-%         [t,data,SAChdr] = fget_sac(fullfile(sacfiles(j).folder,sacfiles(j).name));
-%         tmp.d = data;
-%         tmp.t = t;
-%         tmp.stla=SAChdr.station.stla;
-%         tmp.stlo=SAChdr.station.stlo;
-%         tmp.stel=SAChdr.station.stel;
-%         tmp.sta =SAChdr.station.kstnm;
-%         tmp.evla=SAChdr.event.evla;
-%         tmp.evlo=SAChdr.event.evlo;
-%         tmp.evdp=SAChdr.event.evdp/1000.; % meter to kilometer
-%         tmp.mag=SAChdr.event.mag;
-%         tmp.dist=SAChdr.evsta.dist;
-%         tmp.az=SAChdr.evsta.az;
-%         tmp.baz=SAChdr.evsta.baz;
-%         tmp.gcarc=SAChdr.evsta.gcarc;
-%         % calculate the bounce point (midpoint)
-%         [tmp.bplat,tmp.bplon]=gc_midpoint(tmp.evla, tmp.evlo, tmp.stla, tmp.stlo);
-%         % calculate SS arrival time
-%         times=taupTime('prem',tmp.evdp,'SS,S^410S,S^660S','sta',[tmp.stla tmp.stlo],...
-%             'evt',[tmp.evla,tmp.evlo]);
-%         tmp.t660=times(1).time;
-%         tmp.t410=times(2).time;
-%         tmp.tss=times(3).time;
-%         ss=[ss tmp];
-%     end
-% end
-% 
-% % save as mat
-% % save 'ss.mat' 'ss';
 
-load ss_field.mat
-
-figure;
-plot([ss.bplon],[ss.bplat],'.')
-k=2;
-figure;
-plot(ss(k).t,ss(k).d/max(ss(k).d)); hold on;
-plot([ss(k).t410,ss(k).t410],[-1,1],'--r');
-plot([ss(k).t660,ss(k).t660],[-1,1],'--r');
-plot([ss(k).tss,ss(k).tss],[-1,1],'--r');
-% calculate SNR
-for k=1:length(ss)
-    d=ss(k).d;
-    t=ss(k).t;
-    tss=ss(k).tss;
-    ss(k).snr = ss_snr(d,t,tss);
-end
-% check polarity reversal
-for k=1:length(ss)
-    d=ss(k).d;
-    t=ss(k).t;
-    tss=ss(k).tss;
-    [d,is_reversal] = ss_check_polarity(d,t,tss);
-    ss(k).is_reversal = is_reversal;
-    if is_reversal
-        ss(k).d = d;
-    end
-end
-remove = [ss.snr]<=5;
-ss(remove) = [];
-% apply cross-correlation to all traces
-nt=length(t);
-for k=1:length(ss)
-    ss(k).d=ss(k).d(1:nt);
-end
-din = [ss.d]; % flatten the tensor
-N=5; % number of iteration for cross-correlation measurments
-t=0:nt-1;
-times = repmat(t(:),1,size(din,2));
-t0=ones(1,size(din,2))*900; % SS arrival
-xwin=[-100 100]; % cross-correlation window
-maxlag=50; % maximum time lag
-is_plot=0; % flag controls plotting
-dout = ss_align_v2(din,times,N,t0,xwin,maxlag,is_plot);
-for k=1:length(ss)
-    ss(k).d=dout(:,k);
-end
-%% Binning
-dx=5; dy=5; dh=2;
-
-xmin=110; ymin=20; hmin=100;
-xmax=160; ymax=60; hmax=170;
-% define grid center
-x = xmin+dx/2:dx:xmax;
-y = ymin+dy/2:dy:ymax;
-h = hmin+dh/2:dh:hmax;
-t = ss(1).t;
-
-% dx=2.5; dy=2.5; dh=2;
-% xmin=110; ymin=20; hmin=100;
-% xmax=160; ymax=60; hmax=170;
-lonlim=[xmin xmax];
-latlim=[ymin ymax];
-% define grid center
-% x = xmin+dx/2:dx:xmax;
-% y = ymin+dy/2:dy:ymax;
-% h = hmin+dh/2:dh:hmax;
-% t = ss(1).t;
-% nx=length(x); ny=length(y); nh=length(h); nt = length(t);
-% disp('Binning')
-
-nx=length(x); ny=length(y); nh=length(h); nt = length(t);
-disp('Binning')
-% 5D case
-% d1=zeros(nt, nx, ny, nh, nphi);
-% 4D case
-d1 = zeros(nt, nx, ny, nh);
-fold_map=zeros(nx,ny,nh);
-flow=1/75.;
-fhigh=1/15.;
-for n=1:length(ss)
-    j=floor((ss(n).bplat-ymin)/dy)+1;
-    i=floor((ss(n).bplon-xmin)/dx)+1;
-    k=floor((ss(n).gcarc-hmin)/dh)+1;
-%   l=floor(ss(n).phi/dphi)+1;
-    fold_map(i,j,k)=fold_map(i,j,k)+1;
-    d=ss(n).d;
-    % bandpass filter
-    d_filt=bandpassSeis(d,1,flow,fhigh,3);
-    d_filt=d_filt/max(d_filt);
-    d1(:,i,j,k)=d1(:,i,j,k)+d_filt(1:nt);
-end
-% nomalization
-for i=1:nx
-    for j=1:ny
-        for k=1:nh
-            if fold_map(i,j,k)>0
-               d1(:,i,j,k)=d1(:,i,j,k)/fold_map(i,j,k); 
-            end
-        end
-    end
-end
-
-% plot fold map
-fold_map_xy=sum(fold_map,3);
-figure;
-set(gcf,'Position',[100 100 1000 800],'color','w')
-imagesc(x,y,fold_map_xy'); hold on;
-cm=colormap('gray');
-colormap(flipud(cm));
-colorbar;
-axis tight;
-plot([ss.bplon],[ss.bplat],'b.'); 
-xlabel('Longitude (deg)');
-ylabel('Latitude (deg)');
-colorbar;
-set(gca,'fontsize',14)
-axis equal;
-%% stack the CMP bin 
-addpath m_map;
-
-fold_map_xy=sum(fold_map,3);
-figure;
-set(gcf,'Position',[100 100 1600 800],'color','w')
-subplot(121)
-m_proj('lambert','long', lonlim, 'lat', latlim); hold on;
-set(gcf,'color','w');
-[X,Y]=meshgrid(x,y);
-hs=m_scatter([ss.bplon],[ss.bplat],5,'b','filled');
-alpha(hs,0.5);
-m_gshhs('i','line','color','k','linewidth',1)
-m_gshhs('lb2','line','color','k')
-m_grid('linewidth',2,'tickdir','out',...
-    'xaxisloc','bottom','yaxisloc','left','fontsize',24);
-text(-0.12,0.98,'(a)','Units','normalized','FontSize',32)
-title('Bounce points','fontsize',30)
-
-subplot(122)
-m_proj('lambert','long', lonlim, 'lat', latlim); hold on;
-[X,Y]=meshgrid(x,y);
-hh=m_pcolor(X,Y,fold_map_xy');
-set(hh,'edgecolor','none')
-cm=colormap('gray');
-colormap(flipud(cm));
-caxis([0 300])
-m_gshhs('i','line','color','k','linewidth',1)
-m_gshhs('lb2','line','color','k')
-m_grid('linewidth',2,'tickdir','out',...
-    'xaxisloc','bottom','yaxisloc','left','fontsize',24);
-hh=colorbar('h');
-set(hh,'fontsize',24);
-set(hh,'Position',[0.6 0.1256 0.3 0.0250])
-xlabel(hh,'Count');
-text(-0.12,0.98,'(b)','Units','normalized','FontSize',32)
-% export_fig(gcf,'fold_map.png','-q300')
-title('Fold map','fontsize',30)
-%
-for n=1:nh
-    times=taupTime('ak135',10,'SS,S^410S,S^660S','deg',h(n));
-    indices = find(strcmp({times.phaseName},'S^660S'));
-    t660(n)=times(indices(1)).time;
-    indices = find(strcmp({times.phaseName},'S^410S'));
-    t410(n)=times(indices(1)).time;
-    indices = find(strcmp({times.phaseName},'SS'));
-    tss(n)=times(indices(1)).time;
-end
-%%
-
-d2dssp = squeeze(mean(mean(d1,3),2)); % simple averaging
-W = any(d1);    % obtain the non-zero trace=
-w = squeeze(sum(sum(W,3),2));  % calcualte the weight
-d2d_w = squeeze(sum(sum(d1,3),2))*diag(1./w); % weighted averaging
-size(d1)
-size(d2dssp)
-% find the time of SS phase and set it to 0 time
-[~,index] = max(sum(d2dssp,2));
-tshift = t(index);
-t=t-tshift;
-% %%
-size(fold_map)
-ntraces = squeeze(sum(sum(fold_map,2),1));
-size(ntraces)
-%%
-% conduct NMO correction with a simple time-shift method
-d2dssp_nmo=zeros(size(d2dssp));
-h0=135;
-is_plot=false;
-for n=1:nh
-    din = d2dssp(:,n);
-    [dout,t410_ref,t660_ref] = ss_nmo(din,t,h(n),h0,is_plot);
-    d2dssp_nmo(:,n)=dout;
-end
-%%
-% size(d2dssp_nmo);
-% figure;
-% subplot(511)
-% % bar(h,ntraces)
-% subplot(5,1,2:5)
-% set(gcf,'Position',[0 0 1000 1000],'Color','w')
-% wigb(d2dssp,10,h,t);
-% plot(h,ones(1,nh)*t410_ref,'--r')
-% plot(h,ones(1,nh)*t660_ref,'--r')
-% axis xy
-% ylim([-450 50])
-% ylabel('Time (s)')
-% xlabel('Distance (deg)')
-% set(gca,'fontsize',14)
-% 
-% size(d2dssp_nmo)
-% figure;
-% subplot(511)
-% % bar(h,ntraces)
-% subplot(5,1,2:5)
-% set(gcf,'Position',[0 0 1000 1000],'Color','w')
-% wigb(d2dssp_nmo,10,h,t);
-% plot(h,ones(1,nh)*t410_ref,'--r')
-% plot(h,ones(1,nh)*t660_ref,'--r')
-% axis xy
-% ylim([-450 50])
-% ylabel('Time (s)')
-% xlabel('Distance (deg)')
-% set(gca,'fontsize',14)
-
-% compare the stacked trace
-% figure;
-% plot(t,sum(d2d,2)); hold on;
-% plot(t,sum(d2d_nmo,2));
-% apply NMO correction to all traces
-d1_nmo=zeros(size(d1));
-h0=135;
-is_plot=false;
-%%
-% parfor i=1:nx
-for i=1:nx;
-    for j=1:ny
-        for k=1:nh
-            din = d1(:,i,j,k);
-            if any(d)
-                dout = ss_nmo(din,t,h(k),h0,is_plot);
-                d1_nmo(:,i,j,k)=dout;
-            end
-        end
-    end
-end
-
-% q=size(d3Dnxnynh15)
-%                d3Dnxnynh15noNMO=d1(:,:,:,15);
-% %                d3Dnxnynh15=d1_nmo(:,:,:,15);   
-%                
-%                d3Dnxnynh1=d1_nmo(:,:,:,1);   
-% perform stacking for each CMP gather
-d3d_nmo = zeros(nt,nx,ny);
-d3d = zeros(nt,nx,ny);
-for i=1:nx
-    for j=1:ny
-        % move-out corrected cmp
-        d_cmp = squeeze(d1_nmo(:,i,j,:));
-        nstack = sum(any(d_cmp));
-        if nstack>0
-            d_stack = sum(d_cmp,2)/nstack;
-            d3d_nmo(:,i,j)=d_stack;
-        end
-        % non-move-out corrected cmp
-        d_cmp = squeeze(d1(:,i,j,:));
-        nstack = sum(any(d_cmp));
-        if nstack>0
-            d_stack = sum(d_cmp,2)/nstack;
-            d3d(:,i,j)=d_stack;
-        end
-    end
-end
 %% 3D post-stack reconstruction using RDRR algorithm
+% save ss3d_field.mat ss3d_nmo d3d_nmo d03d mask t t0 t1 t410_ref t660_ref keep nt nx ny nh 
+
+load ss3d_field.mat 
+
 t0=-300;
 t1=-100;
+
 %t0=-500;
 %t1=100;
+
 keep = t>=t0 & t<=t1;
 ss3d_nmo = d3d_nmo(keep,:,:);
+
 [nt,nx,ny]=size(ss3d_nmo);
+
 %
 mask = repmat(any(ss3d_nmo),size(ss3d_nmo,1),1);
 
 d03d=ss3d_nmo.*mask;
+
+% save ss3d_nmo.mat ss3d_nmo d3d_nmo d03d mask t t0 t1 t410_ref t660_ref keep x y nt nx ny nh dx dy dh 
+
 u=size(d03d);
 dt=1;
 flow=1/75;
@@ -355,7 +53,7 @@ fhigh=1/15.;
 Niter=10;
 mode=1;
 verb=1;
-a=(Niter-(1:Niter))/(Niter-1) %linearly decreasing
+a=(Niter-(1:Niter))/(Niter-1); %linearly decreasing
 
 N=5; % Rank 
 K=2;  % Damping factor
@@ -365,7 +63,9 @@ ws=1;      % Window size
 %%
 d3=fxyrdrr3d_denoising_recon(d03d,mask,flow,fhigh,dt,N,K,Niter,eps,verb,mode,a,u,e,ws);
 
-%% 4D reconstruction using RDRR algorithm
+%% 4D pre-stack reconstruction using RDRR algorithm
+
+load ss4d_field.mat
 ss4d_nmo = d1_nmo(keep,:,:,:);
 [nt,nx,ny,nh]=size(ss4d_nmo);
 % o=size(ss3d_nmo)
@@ -373,6 +73,8 @@ mask = repmat(any(ss4d_nmo),size(ss4d_nmo,1),1);%
 d04d=ss4d_nmo.*mask;
 flow=1/75;
 fhigh=1/15.;
+
+% save ss4d_field.mat ss4d_nmo d1_nmo d04d mask t t0 t1 t410_ref t660_ref keep nt nx ny nh 
 
 N=200; % Rank 
 % N=5;
