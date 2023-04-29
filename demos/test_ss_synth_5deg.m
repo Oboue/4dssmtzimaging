@@ -9,17 +9,14 @@ clear; close all; clc;
 %% Read in data and calculate bounce point (midpoint)
 addpath('../rdrr')
 addpath('../data') 
-addpath('../etopo1_bed_c_f4') 
 javaaddpath('./FMI/lib/FMI.jar');
 addpath('~/MATLAB/m_map');
-addpath('../Meier_2009') 
 addpath('../slab')
 addpath('../MatSAC');
 addpath('../utils');
 addpath('../subroutines');
 addpath('./FMI/matTaup');
 addpath('../TX2019slab')
-addpath('../irisFetch-matlab-2.0.12')
 addpath export_fig
 
 %% 4D pre-stack reconstruction using RDRR algorithm
