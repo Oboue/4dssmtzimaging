@@ -1,4 +1,4 @@
-# 4dssmtzimaging
+### 4dssmtzimaging
 [![DOI](https://zenodo.org/badge/634074226.svg)](https://zenodo.org/badge/latestdoi/634074226)
 
 # Reference
@@ -6,7 +6,7 @@ Oboué,  Y.A.S.I, Y. Chen, J. Wang, X. Jiang, R.M.H. Dokht, Y. J. Gu, M. Koroni,
 
 Innocent Oboué ,Y.A.S.,W.Chen,H.Wang,andY.Chen(2021),Robust damped rank- reduction method for simultaneous denoising and reconstruction of 5d seismic data, Geophysics, 86(1), V71–V89.
 
-# BibTex:
+BibTex:
 @software{oboue_yapo_abole_serge_innocent_2023_7889972,
 
   author       = {Oboué, Yapo Abolé Serge Innocent and
