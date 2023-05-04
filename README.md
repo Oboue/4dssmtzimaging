@@ -10,9 +10,9 @@
 Oboué,  Y.A.S.I, Y. Chen, J. Wang, X. Jiang, R.M.H. Dokht, Y. J. Gu, M. Koroni, and Y. Chen, 2023, High-resolution mantle transition zone imaging using multi-dimensional reconstruction of SS precursors, Journal of Geophysical Research: Solid Earth, under review.
 
 Innocent Oboué ,Y.A.S.,W.Chen,H.Wang,andY.Chen(2021),Robust damped rank- reduction method for simultaneous denoising and reconstruction of 5d seismic data, Geophysics, 86(1), V71–V89.
-
-BibTex:
 #
+BibTex:
+
 @software{oboue_yapo_abole_serge_innocent_2023_7889972,
 
   author       = {Oboué, Yapo Abolé Serge Innocent and
