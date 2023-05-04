@@ -1,8 +1,12 @@
 ### 4dssmtzimaging
 
-[![DOI](https://zenodo.org/badge/634074226.svg)](https://zenodo.org/badge/latestdoi/634074226)
+### Description
+4dssmtzimaging is an open-source package for 3D and 4D mantle transition zone imaging. The methodology is detailed in Oboué,  Y.A.S.I, Y. Chen, J. Wang, X. Jiang, R.M.H. Dokht, Y. J. Gu, M. Koroni, and Y. Chen, 2023, High-resolution mantle transition zone imaging using multi-dimensional reconstruction of SS precursors, Journal of Geophysical Research: Solid Earth, under review.
 
 # Reference
+
+[![DOI](https://zenodo.org/badge/634074226.svg)](https://zenodo.org/badge/latestdoi/634074226)
+
 Oboué,  Y.A.S.I, Y. Chen, J. Wang, X. Jiang, R.M.H. Dokht, Y. J. Gu, M. Koroni, and Y. Chen, 2023, High-resolution mantle transition zone imaging using multi-dimensional reconstruction of SS precursors, Journal of Geophysical Research: Solid Earth, under review.
 
 Innocent Oboué ,Y.A.S.,W.Chen,H.Wang,andY.Chen(2021),Robust damped rank- reduction method for simultaneous denoising and reconstruction of 5d seismic data, Geophysics, 86(1), V71–V89.
@@ -32,9 +36,6 @@ BibTex:
   doi          = {10.5281/zenodo.7889972},
   
   url          = {https://doi.org/10.5281/zenodo.7889972}}
-
-# 
-
 #
 @article{innocent2021robust,
 
