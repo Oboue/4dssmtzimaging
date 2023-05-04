@@ -30,8 +30,7 @@ Innocent Oboué ,Y.A.S.,W.Chen,H.Wang,andY.Chen(2021),Robust damped rank- reduct
   
   doi          = {10.5281/zenodo.7889972},
   
-  url          = {https://doi.org/10.5281/zenodo.7889972}
-}
+  url          = {https://doi.org/10.5281/zenodo.7889972}}
 
 # 
 
@@ -51,5 +50,4 @@ Innocent Oboué ,Y.A.S.,W.Chen,H.Wang,andY.Chen(2021),Robust damped rank- reduct
 	
 	year={2021},
 	
-	publisher={Society of Exploration Geophysicists}
-}
+	publisher={Society of Exploration Geophysicists}}
