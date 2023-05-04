@@ -10,6 +10,7 @@ Innocent Oboué ,Y.A.S.,W.Chen,H.Wang,andY.Chen(2021),Robustdampedrank- reductio
 # BibTex
 
 @software{oboue_yapo_abole_serge_innocent_2023_7889972,
+
   author       = {Oboué, Yapo Abolé Serge Innocent and
                   Chen, Yunfeng and
                   Wang, Jingchuan and
@@ -36,7 +37,9 @@ Innocent Oboué ,Y.A.S.,W.Chen,H.Wang,andY.Chen(2021),Robustdampedrank- reductio
 
 
 @article{innocent2021robust,
-	title={Robust damped rank-reduction method for simultaneous denoising and reconstruction of 5D seismic data},\\
+
+	title={Robust damped rank-reduction method for simultaneous denoising and reconstruction of 5D seismic data},
+	
 	author={Innocent Obou{\'e}, Yapo Abol{\'e} Serge and Chen, Wei and Wang, Hang and Chen, Yangkang},
 	
 	journal={Geophysics},
