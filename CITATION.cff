@@ -1,9 +1,14 @@
-cff-version: 1.1.0
-"If you use this software, please cite it as below."
-@software{oboue_2023_7889972,
-  author       = {Yapo Abolé Serge Innocent Oboué, Yunfeng Chen, Jingchuan Wang, Xiuxuan Jiang, Ramin M.H. Dokht, Yu Jeffrey Gu, Maria Koroni, and Yangkang Chen},
-  title        = {High-resolution mantle transition zone imaging using multi-dimensional reconstruction of SS precursors},
-  month        = April,
+@software{oboue_yapo_abole_serge_innocent_2023_7889972,
+  author       = {Oboué, Yapo Abolé Serge Innocent and
+                  Chen, Yunfeng and
+                  Wang, Jingchuan and
+                  Jiang, Xiuxuan and
+                  Dokht, Ramin M.H. and
+                  Gu, Yu Jeffrey and
+                  Koroni, Maria and
+                  Chen, Yangkang},
+  title        = {Multi-dimensional reconstruction of SS precursors},
+  month        = may,
   year         = 2023,
   publisher    = {Zenodo},
   version      = {0.1},
